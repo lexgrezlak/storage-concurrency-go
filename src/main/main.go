@@ -1,7 +1,11 @@
 // I guess a better approach would be to split the program into microservices,
 // one would be dealing with the CSV (and adding data to Redis),
 // and the second one would just plainly serve the data from Redis.
-// They could communicate through gRPC.
+// They could communicate through gRPC or MQTT, for example.
+//
+// Actually, I've just realized I've probably should've used a message queuing
+// system like RabbitMQ or Apache Kafka - I haven't had any experience with that besides with NodeJS workers briefly.
+// I haven't manage to use that, unfortunately, because I probably wouldn't have finished it within 4-6 hours.
 
 package main
 
