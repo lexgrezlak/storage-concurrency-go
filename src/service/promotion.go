@@ -60,10 +60,12 @@ func GetPromotionsFromCSV(ctx context.Context, b io.Reader) <-chan *Promotion {
 				if err == io.EOF {
 					break
 				} else if err != nil {
+					// We'll skip the record that record that returned an error.
 					log.Printf("failed to read record from csv: %v", err)
 				} else {
 					p, err := processRecordToPromotion(record)
 					if err != nil {
+						// We'll skip the record that record that returned an error.
 						log.Printf("failed to process record to promotion: %v", err)
 					} else {
 						promotions <- p
