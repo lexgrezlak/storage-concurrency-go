@@ -8,7 +8,7 @@ docker-compose up
 There are default values provided, but you can change them either in `configs/development.yml` or `docker.env`
 
 ## Features
-Concurrently reads from the provided csv file records, add them to Redis, and serves the data using the endpoint below.
+Concurrently reads records from the provided csv file, add them to Redis, and serves the data using the endpoint below.
 
 
 ### Endpoint
