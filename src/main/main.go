@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"storage-api/src/config"
 	"storage-api/src/database"
 	"storage-api/src/handler"
 	"storage-api/src/service"
@@ -18,8 +19,17 @@ const (
 )
 
 func main() {
+	// Initialize config. If it can't find the file, it will load the variables
+	// from the environment. It would be a good idea to read the file path to the config
+	// from environment, because we might want to have `test.yml` or some other config.
+	c, err := config.GetConfig("development.yml")
+	if err != nil {
+		log.Fatalf("failed to load config: %v", err)
+	}
+	log.Printf("config has been loaded: %v", c)
+
 	// Set up Redis.
-	redis, err := database.NewRedisClient()
+	redis, err := database.NewRedisClient(c.Redis)
 	if err != nil {
 		log.Fatalf("failed to connect to redis: %v", err)
 	}
@@ -36,6 +46,9 @@ func main() {
 	// Measure the performance of parsing and processing the CSV.
 	start := time.Now()
 
+	// For the purposes of this problem we'll read the CSV just from the file saved on disk,
+	// and the filename will be a hardcoded value. Therefore you need to run the program
+	// from the project's root directory, that is `go run src/main/main.go`.
 	// Open the csv file and read its records.
 	f, err := os.Open("promotions.csv")
 	if err != nil {
@@ -43,7 +56,7 @@ func main() {
 	}
 	defer f.Close()
 	promotions := service.GetPromotionsFromCSV(context.Background(), f)
-	log.Printf("Parsed and processed csv in %2f seconds", time.Since(start).Seconds())
+	log.Printf("parsed and processed csv in %2f seconds", time.Since(start).Seconds())
 
 	// Set the records in Redis
 	go func() {
@@ -66,9 +79,7 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
-
 	log.Printf("Listening at: %v", srv.Addr)
 	err = srv.ListenAndServe()
 	log.Fatal(err)
-
 }

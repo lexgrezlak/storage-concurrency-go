@@ -11,6 +11,7 @@ require (
 	github.com/codesenberg/concurrent v0.0.0-20180531114123-64560cfcf964 // indirect
 	github.com/go-redis/redis/v8 v8.0.0-beta.7
 	github.com/gorilla/mux v1.7.4
+	github.com/ilyakaznacheev/cleanenv v1.2.4
 	github.com/juju/ratelimit v1.0.1 // indirect
 	github.com/klauspost/compress v1.10.10 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect

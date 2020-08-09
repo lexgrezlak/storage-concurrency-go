@@ -18,8 +18,8 @@ WORKDIR /root/
 
 COPY --from=builder /app/main .
 
-# Example data
-COPY --from=builder /app/data/csv/promotions.csv .
+# Example data, it's not the best solution.
+COPY --from=builder /app/promotions.csv .
 
 EXPOSE 1321
 

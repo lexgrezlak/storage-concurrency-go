@@ -3,16 +3,18 @@ package database
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
+	"storage-api/src/config"
 )
 
-func NewRedisClient() (*redis.Client, error) {
+func NewRedisClient(c config.RedisConfig) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     c.Address,
+		Password: c.Password,
+		DB:       c.DB,
 	})
 
 	// Check if connection has been established.
 	_, err := client.Ping(context.Background()).Result()
 	return client, err
 }
+

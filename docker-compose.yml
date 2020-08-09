@@ -19,6 +19,8 @@ services:
       nofile:
         soft: 20000
         hard: 40000
+    env_file:
+      - docker.env
   redis:
     image: "redis:alpine"
     command: redis-server
