@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/csv"
+	"encoding/json"
 	"io"
 	"log"
 	"strconv"
@@ -12,6 +13,21 @@ type Promotion struct {
 	Id string `json:"id"`
 	Price float64 `json:"price"`
 	Date string `json:"date"`
+}
+
+func (api *api) GetPromotionById(id string) (*Promotion, error) {
+	jsonStr, err := api.r.Get(context.Background(), id).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	var p Promotion
+	if err = json.Unmarshal([]byte(jsonStr), &p); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &p, nil
 }
 
 func processRecordToPromotion(record []string) (*Promotion, error) {
