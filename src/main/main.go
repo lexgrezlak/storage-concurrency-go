@@ -43,6 +43,7 @@ func main() {
 
 	// Set up middleware.
 	router.Use(middleware.Logger)
+	router.Use(middleware.RequestLimiter)
 
 	// Set up handlers.
 	router.HandleFunc("/promotions/{id}", handler.GetPromotionById(api)).Methods(http.MethodGet)
