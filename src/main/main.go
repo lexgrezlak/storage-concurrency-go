@@ -10,6 +10,7 @@ import (
 	"storage-api/src/config"
 	"storage-api/src/database"
 	"storage-api/src/handler"
+	"storage-api/src/middleware"
 	"storage-api/src/service"
 	"time"
 )
@@ -39,6 +40,9 @@ func main() {
 
 	// Set up router.
 	router := mux.NewRouter()
+
+	// Set up middleware.
+	router.Use(middleware.Logger)
 
 	// Set up handlers.
 	router.HandleFunc("/promotions/{id}", handler.GetPromotionById(api)).Methods(http.MethodGet)
