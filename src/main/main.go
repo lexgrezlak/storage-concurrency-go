@@ -1,3 +1,8 @@
+// I guess a better approach would be to split the program into microservices,
+// one would be dealing with the CSV (and adding data to Redis),
+// and the second one would just plainly serve the data from Redis.
+// They could communicate through gRPC.
+
 package main
 
 import (
@@ -54,7 +59,7 @@ func main() {
 	// For the purposes of this problem we'll read the CSV just from the file saved on disk,
 	// and the filename will be a hardcoded value. Therefore you need to run the program
 	// from the project's root directory, that is `go run src/main/main.go`.
-	// Open the csv file and read its records.
+	// Open the csv file and read its records (promotions).
 	f, err := os.Open("promotions.csv")
 	if err != nil {
 		log.Fatalf("failed to open csv file: %v", err)
@@ -84,7 +89,7 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
-	log.Printf("Listening at: %v", srv.Addr)
+	log.Printf("listening at: %v", srv.Addr)
 	err = srv.ListenAndServe()
 	log.Fatal(err)
 }
