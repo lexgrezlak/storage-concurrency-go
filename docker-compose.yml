@@ -12,8 +12,8 @@ services:
       - redis
     links:
       - redis:redis
-#   ulimits set so that it supports a large amount of requests
-#   per second
+#   We need to set ulimits so that it supports a large amount of requests
+#   per second, otherwise the server would be throwing errors on high load.
     ulimits:
       nproc: 65535
       nofile:
