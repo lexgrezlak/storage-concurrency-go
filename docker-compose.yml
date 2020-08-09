@@ -1,22 +1,38 @@
 version: "3"
 services:
+  web:
+    container_name: web-storage-api
+    image: alex123189/web-storage-api:1.0
+    ports:
+      - "1321:1321"
+    restart: always
+    networks:
+      - app
+    depends_on:
+      - redis
+    links:
+      - redis:redis
+#   ulimits set so that it supports a large amount of requests
+#   per second
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
   redis:
     image: "redis:alpine"
     command: redis-server
     ports:
       - "6379:6379"
+    expose:
+      - 6379
     volumes:
       - $PWD/data/redis:/var/lib/redis
       - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
     environment:
       - REDIS_REPLICATION_MODE=master
     networks:
-      node_net:
-        ipv4_address: 172.28.1.4
-# networking for the Redis container
+      - app
 networks:
-  node_net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.28.0.0/16
+  app:
+    driver: bridge
