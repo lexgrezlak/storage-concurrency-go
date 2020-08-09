@@ -17,5 +17,5 @@ curl http://localhost:1321/promotions/promotion-id-from-promotions.csv
 ```
 returns
 ```
-{"id":"172FFC14-D229-4C93-B06B-F48B8C095512", "price":9.68, "expiration_date": "2018-06-04 06:01:20"}
+{"id":"promotion-id-from-promotions.csv", "price":9.68, "expiration_date": "2018-06-04 06:01:20"}
 ```
