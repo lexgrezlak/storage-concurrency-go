@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +11,10 @@ import (
 	"storage-api/src/handler"
 	"storage-api/src/service"
 	"time"
-	"github.com/gorilla/mux"
+)
+
+const (
+	REDIS_EXPIRATION = 30 * time.Minute
 )
 
 func main() {
@@ -27,42 +30,41 @@ func main() {
 	// Set up router.
 	router := mux.NewRouter()
 
+	// Set up handlers.
 	router.HandleFunc("/promotions/{id}", handler.GetPromotionById(api)).Methods(http.MethodGet)
 
 	// Measure the performance of parsing and processing the CSV.
 	start := time.Now()
+
 	// Open the csv file and read its records.
-	f, err := os.Open("data/csv/promotions.csv")
+	f, err := os.Open("promotions.csv")
 	if err != nil {
 		log.Fatalf("failed to open csv file: %v", err)
 	}
 	defer f.Close()
-	promotions, _ := service.GetPromotionsFromCSV(context.Background(), f)
-	fmt.Printf("\n%2fs", time.Since(start).Seconds())
+	promotions := service.GetPromotionsFromCSV(context.Background(), f)
+	log.Printf("Parsed and processed csv in %2f seconds", time.Since(start).Seconds())
 
-	start = time.Now()
+	// Set the records in Redis
 	go func() {
 		for p := range promotions {
-			b, _ := json.Marshal(p)
-			redis.Set(context.Background(), p.Id, b,30*time.Minute)
+			value, err := json.Marshal(p)
+			if err != nil {
+				log.Printf("failed to marshal promotion: %v", err)
+			} else {
+				key := p.Id
+				redis.Set(context.Background(), key, value, REDIS_EXPIRATION)
+			}
 		}
 	}()
 
-
+	// Set up the server.
 	srv := &http.Server{
-		Addr:              "localhost:1321",
-		Handler:           router,
-		TLSConfig:         nil,
-		ReadTimeout:       15 * time.Second,
-		ReadHeaderTimeout: 0,
-		WriteTimeout:      15 * time.Second,
-		IdleTimeout:       120 * time.Second,
-		MaxHeaderBytes:    0,
-		TLSNextProto:      nil,
-		ConnState:         nil,
-		ErrorLog:          nil,
-		BaseContext:       nil,
-		ConnContext:       nil,
+		Addr:         "0.0.0.0:1321",
+		Handler:      router,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
 
 	log.Printf("Listening at: %v", srv.Addr)
